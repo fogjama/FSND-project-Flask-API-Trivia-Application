@@ -34,7 +34,7 @@ def create_app(test_config=None):
   '''
   @app.route('/categories', methods=['GET'])
   def categories():
-    categories = Category.query.all()
+    categories = [category.format() for category in Category.query.all()]
     return jsonify({
       'success': True,
       'categories': categories
@@ -53,31 +53,35 @@ def create_app(test_config=None):
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions. 
   '''
-  @app.route('/questions', methods=['GET'])
-  def get_question_list():
+
+  def paginate_questions(request, selection):
     page = request.args.get('page', 1, type=int)
     start = (page - 1) * QUESTIONS_PER_PAGE
     end = start + QUESTIONS_PER_PAGE
-    error: False
-    try:
-      questions = Question.query.all()
-      total_questions = len(Questions.query.all())
-    except:
-      error = True
-      questions = None
-      total_questions = None
+
+    questions = [question.format() for question in selection]
+    questions = questions[start:end]
+
+    return questions
+
+  @app.route('/questions', methods=['GET'])
+  def get_question_list():
+    selection = Question.query.order_by(Question.id).all()
+    questions = paginate_questions(request, selection)
     
-    try:
-      categories = Category.query.all()
-      current_category = Category.query.one()
-    except:
-      error = True
-      categories = None
-      current_category = None
+    total_questions = len(Question.query.all())
+    
+    c_query = Category.query.all()
+    categories = []
+    for c in c_query:
+      categories.append(c.type)
+
+    current_category = categories[0]
 
     return jsonify({
-      'questions': questions[start:end],
-      'total_questoins': total_questions,
+      'success': True,
+      'questions': questions,
+      'total_questions': total_questions,
       'categories': categories,
       'current_category': current_category
     })
@@ -134,10 +138,15 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
-  @app.route('/categories/<int:category_id>/questions', methods=['GET'])
+  @app.route('/categories/<category_id>/questions', methods=['GET'])
   def get_questions(category_id):
-    print(category_id)
-    pass
+    selection = Question.query.filter_by(category=category_id).all()
+    questions = paginate_questions(request, selection)
+    
+    return({
+      'success': True,
+      'questions': questions
+    })
 
 
   '''
