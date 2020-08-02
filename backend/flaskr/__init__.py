@@ -107,10 +107,9 @@ def create_app(test_config=None):
         
       if q == None:
         abort(404)
-      
-      print(q, file=sys.stderr)
 
       return jsonify({
+        'success': True,
         'id': q.id,
         'question': q.question,
         'answer': q.answer,
@@ -118,7 +117,7 @@ def create_app(test_config=None):
         'difficulty': q.difficulty
       })
     except:
-      abort(422)
+      abort(404)
 
 
   # '''
@@ -145,7 +144,7 @@ def create_app(test_config=None):
       })
 
     except:
-      abort(422)
+      abort(404)
 
   # '''
   # @TODO: 
@@ -176,7 +175,7 @@ def create_app(test_config=None):
     })
 
     except Exception as e:
-      print(f'Exception: --> {e}', file=sys.stderr)
+      # print(f'Exception: --> {e}', file=sys.stderr)
       abort(422)
 
 
@@ -193,7 +192,11 @@ def create_app(test_config=None):
   @app.route('/questions/<search_term>', methods=['POST'])
   def search_questions(search_term):
     selection = Question.query.filter(Question.question.ilike('%' + search_term + '%')).all()
-    questions = [question.format() for question in selection]
+
+    if len(selection) == 0:
+      questions = None
+    else:
+      questions = [question.format() for question in selection]
 
     return({
       'success': True,
@@ -305,6 +308,15 @@ def create_app(test_config=None):
       'error': 500, 
       'message': 'Internal server error'
     }), 500
+  
+
+  @app.errorhandler(405)
+  def method_not_allowed(error):
+    return jsonify({
+      'success': False,
+      'error': 405,
+      'message': 'Method not allowed'
+    }), 405
   
 
   return app
