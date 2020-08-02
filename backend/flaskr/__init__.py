@@ -161,18 +161,6 @@ def create_app(test_config=None):
       'current_category': cat_id
     })
 
-
-  # '''
-  # @TODO: 
-  # Create a POST endpoint to get questions to play the quiz. 
-  # This endpoint should take category and previous question parameters 
-  # and return a random questions within the given category, 
-  # if provided, and that is not one of the previous questions. 
-
-  # TEST: In the "Play" tab, after a user selects "All" or a category,
-  # one question at a time is displayed, the user is allowed to answer
-  # and shown whether they were correct or not. 
-  # '''
   @app.route('/quizzes', methods=['POST'])
   def play_game():
 
@@ -204,13 +192,6 @@ def create_app(test_config=None):
     except:
       abort(422)
 
-
-  # '''
-  # @TODO: 
-  # Create error handlers for all expected errors 
-  # including 404 and 422. 
-  # '''
-
   @app.errorhandler(400)
   def bad_request(error):
     return jsonify({
@@ -218,7 +199,6 @@ def create_app(test_config=None):
       'error': 404,
       'message': 'Bad request'
     }), 400
-
 
   @app.errorhandler(404)
   def not_found(error):
@@ -228,7 +208,6 @@ def create_app(test_config=None):
       'message': 'Resource not found'
     }), 404
 
-
   @app.errorhandler(422)
   def unprocessable(error):
     return jsonify({
@@ -237,7 +216,6 @@ def create_app(test_config=None):
       'message': 'Cannot process request'
     }), 422
 
-  
   @app.errorhandler(500)
   def server_error(error):
     return jsonify({
@@ -246,7 +224,6 @@ def create_app(test_config=None):
       'message': 'Internal server error'
     }), 500
   
-
   @app.errorhandler(405)
   def method_not_allowed(error):
     return jsonify({
@@ -255,7 +232,6 @@ def create_app(test_config=None):
       'message': 'Method not allowed'
     }), 405
   
-
   return app
 
     
