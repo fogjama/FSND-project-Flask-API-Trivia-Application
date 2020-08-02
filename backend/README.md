@@ -73,7 +73,8 @@ One note before you delve into your tasks: for each endpoint you are expected to
 #### GET '/categories'
 - Fetches a list of category names
 - Request arguments: None
-- Sample response: ```
+- Sample response: 
+```
 {
     'success': True,
     ['Science', 'Art', 'Geography',...]
