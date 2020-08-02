@@ -14,6 +14,12 @@ That's where you come in! Help them finish the trivia app so they can start hold
 
 Completing this trivia app will give you the ability to structure plan, implement, and test an API - skills essential for enabling your future applications to communicate with others. 
 
+## Base URL
+The application runs only from the local host
+```
+    http://127.0.0.1:5000
+```
+
 ## Tasks
 
 There are `TODO` comments throughout project. Start by reading the READMEs in:
