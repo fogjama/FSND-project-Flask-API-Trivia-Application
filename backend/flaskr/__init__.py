@@ -21,6 +21,11 @@ def paginate_questions(request, selection):
   return page_questions
 
 
+def adjust_category_id(cat_id):
+  adjusted_cat_id = str(int(cat_id) + 1)
+
+  return adjusted_cat_id
+
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
@@ -205,7 +210,8 @@ def create_app(test_config=None):
   # '''
   @app.route('/categories/<category_id>/questions', methods=['GET'])
   def get_questions(category_id):
-    selection = Question.query.filter_by(category=category_id).all()
+    cat_id = adjust_category_id(category_id)
+    selection = Question.query.filter_by(category=cat_id).all()
     questions = [question.format() for question in selection]
     
     return({
@@ -227,16 +233,38 @@ def create_app(test_config=None):
   '''
   @app.route('/quizzes', methods=['POST'])
   def play_game():
-    print(request.get_json())
-    pass
+
+    body = request.get_json()
+
+    try:
+      previous_questions = body['previous_questions']
+      quiz_category = body['quiz_category']
+
+      if quiz_category['type'] == 'click':
+        available_questions = Question.query.filter(Question.id.notin_(previous_questions)).all()
+      else:
+        cat_id = adjust_category_id(quiz_category['id'])
+        available_questions = Question.query.filter(Question.category==cat_id).filter(Question.id.notin_(previous_questions)).all()
+
+      if len(available_questions > 0):
+        question = available_questions[random.randrange(0, len(available_questions))].format()
+      else:
+        question = None
+
+      return jsonify({
+        'success': True,
+        'question': question
+      })
+    
+    except:
+      abort(422)
 
 
-
-  '''
-  @TODO: 
-  Create error handlers for all expected errors 
-  including 404 and 422. 
-  '''
+  # '''
+  # @TODO: 
+  # Create error handlers for all expected errors 
+  # including 404 and 422. 
+  # '''
   @app.errorhandler(404)
   def not_found(error):
     return jsonify({
@@ -244,6 +272,7 @@ def create_app(test_config=None):
       'error': 404,
       'message': 'Resource not found'
     }), 404
+
 
   @app.errorhandler(422)
   def unprocessable(error):
@@ -253,6 +282,7 @@ def create_app(test_config=None):
       'message': 'Cannot process request'
     }), 422
   
+
   return app
 
     
