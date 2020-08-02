@@ -71,43 +71,296 @@ One note before you delve into your tasks: for each endpoint you are expected to
 ### Endpoints
 
 #### GET '/categories'
-- Fetches a list of category names
+- Fetches a dictionary of categories in which the keys are the IDs and the values are the category names
 - Request arguments: None
-- Sample response: 
+Sample request:
+```
+curl -X GET http://127.0.0.1:5000/categories
+```
+
+Sample response: 
 ```
 {
-    'success': True,
-    ['Science', 'Art', 'Geography',...]
+  "categories": {
+    "1": "Science",
+    "2": "Art",
+    "3": "Geography",
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
+  },
+  "success": true
 }
 ```
 
 ### GET '/questions?page={page}'
-- Fetches a paginated list of question objects
-- Request arguments: Optional page argument of type integer
-- Returns: a JSON object that contains 
-
-REVIEW_COMMENT
+- Fetches a paginated list of question objects with 10 questions per page
+- Request arguments: Optional page argument of type integer (defaults to 1 if absent)
+- Returns: a list of category strings, a list of question dictionary objects, total number of questions in database, and a default current category.
+Sample request:
 ```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
+curl -X GET http://127.0.0.1:5000/questions?page=2
+```
 
-Endpoints
-GET '/categories'
-GET ...
-POST ...
-DELETE ...
+Sample response:
+```
+{
+  "categories": [
+    "Science",
+    "Art",
+    "Geography",
+    "History",
+    "Entertainment",
+    "Sports"
+  ],
+  "current_category": "Science",
+  "questions": [
+    {
+      "answer": "Apollo 13",
+      "category": "5",
+      "difficulty": 4,
+      "id": 2,
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    },
+    {
+      "answer": "Tom Cruise",
+      "category": "5",
+      "difficulty": 4,
+      "id": 4,
+      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+    },
+    {
+      "answer": "Maya Angelou",
+      "category": "4",
+      "difficulty": 2,
+      "id": 5,
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    },
+    {
+      "answer": "Edward Scissorhands",
+      "category": "5",
+      "difficulty": 3,
+      "id": 6,
+      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+    },
+    {
+      "answer": "Muhammad Ali",
+      "category": "4",
+      "difficulty": 1,
+      "id": 9,
+      "question": "What boxer's original name is Cassius Clay?"
+    },
+    {
+      "answer": "Brazil",
+      "category": "6",
+      "difficulty": 3,
+      "id": 10,
+      "question": "Which is the only team to play in every soccer World Cup tournament?"
+    },
+    {
+      "answer": "Uruguay",
+      "category": "6",
+      "difficulty": 4,
+      "id": 11,
+      "question": "Which country won the first ever soccer World Cup in 1930?"
+    },
+    {
+      "answer": "George Washington Carver",
+      "category": "4",
+      "difficulty": 2,
+      "id": 12,
+      "question": "Who invented Peanut Butter?"
+    },
+    {
+      "answer": "Lake Victoria",
+      "category": "3",
+      "difficulty": 2,
+      "id": 13,
+      "question": "What is the largest lake in Africa?"
+    },
+    {
+      "answer": "The Palace of Versailles",
+      "category": "3",
+      "difficulty": 3,
+      "id": 14,
+      "question": "In which royal palace would you find the Hall of Mirrors?"
+    }
+  ],
+  "success": true,
+  "total_questions": 19
+}
+```
 
-GET '/categories'
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
+### GET '/questions/{question_id}'
+- Fetches a single question dictionary object by its ID
 - Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
-
+- Returns: A dictionary object containing question ID, question string, answer string, category string, and difficulty integer
+Sample response:
 ```
+curl -X GET http://127.0.0.1:5000/questions/10
+```
+
+Sample response:
+```
+{
+  "answer": "Brazil",
+  "category": "6",
+  "difficulty": 3,
+  "id": 10,
+  "question": "Which is the only team to play in every soccer World Cup tournament?",
+  "success": true
+}
+```
+
+### DELETE '/questions/{question_id}'
+- Deletes a single question from the database by its ID
+- Request Arguments: None
+- Returns: ID of deleted question on success
+Sample request:
+```
+curl -X DELETE http://127.0.0.1:5000/questions/20
+```
+
+Sample response:
+```
+{
+    'success': True,
+    'deleted': 20
+}
+```
+
+### POST '/questions'
+- Creates a new question from a JSON string
+- Expected keys:
+    ```
+        question: string
+        answer: string
+        category: string (category id)
+        difficulty: integer (1 to 5)
+    ```
+Sample request:
+```
+curl -X POST -H "Content-Type: application/json" -d '{"question": "What is the largest organ in the human body?","answer": "The skin", "category": "1", "difficulty":1}' http://127.0.0.1:5000/questions
+```
+
+Sample response:
+```
+{
+    'success': True
+}
+```
+
+### POST '/questions/{search_term}'
+- Fetches a list of questions containing a {search_term} in the question string
+- Request Arguments: None
+Sample request:
+```
+curl -X POST http://127.0.0.1:5000/questions/title
+```
+
+Sample response:
+```
+{
+  "questions": [
+    {
+      "answer": "Maya Angelou",
+      "category": "4",
+      "difficulty": 2,
+      "id": 5,
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    },
+    {
+      "answer": "Edward Scissorhands",
+      "category": "5",
+      "difficulty": 3,
+      "id": 6,
+      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+    }
+  ],
+  "success": true
+}
+```
+
+### GET '/categories/{category_id}/questions'
+- Fetches a list of all questions for a specified category ID
+- Request Arguments: None
+
+Sample request:
+```
+curl -X GET http://127.0.0.1:5000/categories/2/questions
+```
+
+Sample response:
+```
+{
+  "current_category": "3",
+  "questions": [
+    {
+      "answer": "Lake Victoria",
+      "category": "3",
+      "difficulty": 2,
+      "id": 13,
+      "question": "What is the largest lake in Africa?"
+    },
+    {
+      "answer": "The Palace of Versailles",
+      "category": "3",
+      "difficulty": 3,
+      "id": 14,
+      "question": "In which royal palace would you find the Hall of Mirrors?"
+    },
+    {
+      "answer": "Agra",
+      "category": "3",
+      "difficulty": 2,
+      "id": 15,
+      "question": "The Taj Mahal is located in which Indian city?"
+    }
+  ],
+  "success": true,
+  "total_questions": 3
+}
+```
+
+### POST '/quizzes'
+- Fetches a random question from the bank of available remaining questions
+- Expects:
+    ```
+        {
+            'previous_questions': [list of question IDs],
+            'quiz_category': {
+                'type': category name as string, or "click"
+                'id': category id as string, or "0"
+            }
+        }
+    ```
+Sample request:
+```
+curl -X POST -H "Content-Type: application/json" -d '{"previous_questions":[], "quiz_category":{"type":"Science","id":"1"}}' http://127.0.0.1:5000/quizzes
+```
+
+Sample response:
+```
+{
+  "question": {
+    "answer": "One",
+    "category": "2",
+    "difficulty": 4,
+    "id": 18,
+    "question": "How many paintings did Van Gogh sell in his lifetime?"
+  },
+  "success": true
+}
+```
+
+## Errors
+Error Code | Description
+-----------|------------
+400 | Bad request, often due to incorrect parameters
+404 | Resource not found
+405 | Method not allowed for endpoint
+422 | Cannot process request
+500 | Internal server error
 
 
 ## Testing
