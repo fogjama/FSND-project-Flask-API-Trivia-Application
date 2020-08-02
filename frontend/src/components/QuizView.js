@@ -16,7 +16,8 @@ class QuizView extends Component {
         numCorrect: 0,
         currentQuestion: {},
         guess: '',
-        forceEnd: false
+        forceEnd: false,
+        questionsPerPlay: 5
     }
   }
 

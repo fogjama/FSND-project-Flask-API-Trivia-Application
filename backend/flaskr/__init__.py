@@ -213,24 +213,26 @@ def create_app(test_config=None):
     cat_id = adjust_category_id(category_id)
     selection = Question.query.filter_by(category=cat_id).all()
     questions = [question.format() for question in selection]
-    
+
     return({
       'success': True,
-      'questions': questions
+      'questions': questions,
+      'total_questions': len(questions),
+      'current_category': cat_id
     })
 
 
-  '''
-  @TODO: 
-  Create a POST endpoint to get questions to play the quiz. 
-  This endpoint should take category and previous question parameters 
-  and return a random questions within the given category, 
-  if provided, and that is not one of the previous questions. 
+  # '''
+  # @TODO: 
+  # Create a POST endpoint to get questions to play the quiz. 
+  # This endpoint should take category and previous question parameters 
+  # and return a random questions within the given category, 
+  # if provided, and that is not one of the previous questions. 
 
-  TEST: In the "Play" tab, after a user selects "All" or a category,
-  one question at a time is displayed, the user is allowed to answer
-  and shown whether they were correct or not. 
-  '''
+  # TEST: In the "Play" tab, after a user selects "All" or a category,
+  # one question at a time is displayed, the user is allowed to answer
+  # and shown whether they were correct or not. 
+  # '''
   @app.route('/quizzes', methods=['POST'])
   def play_game():
 
@@ -246,10 +248,13 @@ def create_app(test_config=None):
         cat_id = adjust_category_id(quiz_category['id'])
         available_questions = Question.query.filter(Question.category==cat_id).filter(Question.id.notin_(previous_questions)).all()
 
-      if len(available_questions > 0):
-        question = available_questions[random.randrange(0, len(available_questions))].format()
-      else:
+      question_bank = [q.format() for q in available_questions]
+
+      if len(question_bank) == 0:
         question = None
+      else:
+        question = question_bank[random.randrange(0, len(available_questions))]
+
 
       return jsonify({
         'success': True,
