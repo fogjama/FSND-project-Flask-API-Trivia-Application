@@ -73,10 +73,17 @@ One note before you delve into your tasks: for each endpoint you are expected to
 #### GET '/categories'
 - Fetches a list of category names
 - Request arguments: None
-- Returns: a list object that contains string values
+- Sample response: ```
+{
+    'success': True,
+    ['Science', 'Art', 'Geography',...]
+}
 ```
-["Science", "Art", "Geography", ...]
-```
+
+### GET '/questions?page={page}'
+- Fetches a paginated list of question objects
+- Request arguments: Optional page argument of type integer
+- Returns: a JSON object that contains 
 
 REVIEW_COMMENT
 ```
