@@ -20,12 +20,6 @@ def paginate_questions(request, selection):
 
   return page_questions
 
-
-def adjust_category_id(cat_id):
-  adjusted_cat_id = str(int(cat_id) + 1)
-
-  return adjusted_cat_id
-
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
@@ -143,22 +137,22 @@ def create_app(test_config=None):
     else:
       questions = [question.format() for question in selection]
 
-    return({
+    return jsonify({
       'success': True,
       'questions': questions
     })
 
   @app.route('/categories/<category_id>/questions', methods=['GET'])
   def get_questions(category_id):
-    cat_id = adjust_category_id(category_id)
-    selection = Question.query.filter_by(category=cat_id).all()
+
+    selection = Question.query.filter_by(category=category_id).all()
     questions = [question.format() for question in selection]
 
-    return({
+    return jsonify({
       'success': True,
       'questions': questions,
       'total_questions': len(questions),
-      'current_category': cat_id
+      'current_category': category_id
     })
 
   @app.route('/quizzes', methods=['POST'])
@@ -173,7 +167,7 @@ def create_app(test_config=None):
       if quiz_category['type'] == 'click':
         available_questions = Question.query.filter(Question.id.notin_(previous_questions)).all()
       else:
-        cat_id = adjust_category_id(quiz_category['id'])
+        cat_id = quiz_category['id']
         available_questions = Question.query.filter(Question.category==cat_id).filter(Question.id.notin_(previous_questions)).all()
 
       question_bank = [q.format() for q in available_questions]
